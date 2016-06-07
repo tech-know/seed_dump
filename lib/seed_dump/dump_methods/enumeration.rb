@@ -1,6 +1,7 @@
 class SeedDump
   module DumpMethods
     module Enumeration
+      
       def active_record_enumeration(records, io, options)
         # If the records don't already have an order,
         # order them by primary key ascending.

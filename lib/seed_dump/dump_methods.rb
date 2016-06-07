@@ -6,7 +6,6 @@ class SeedDump
       return nil if records.count == 0
 
       io = open_io(options)
-
       write_records_to_io(records, io, options)
 
       ensure
@@ -31,7 +30,20 @@ class SeedDump
     end
 
     def dump_attribute_new(attribute, value, options)
-      options[:import] ? value_to_s(value) : "#{attribute}: #{value_to_s(value)}"
+      if options[:import]
+        value_to_s(value)
+      elsif options[:fake]
+        fake_value = nil
+        Faker.constants.each do |constant|
+          next if constant == :Config || constant == :Base
+          fake_value = Faker.const_get(constant).try(attribute.to_sym)
+          break if fake_value.present?
+        end
+        value = fake_value || value
+        "#{attribute}: #{value_to_s(value)}"
+      else
+        "#{attribute}: #{value_to_s(value)}"
+      end
     end
 
     def value_to_s(value)
